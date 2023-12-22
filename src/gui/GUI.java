@@ -1,5 +1,6 @@
 package gui;
 
+import gui.components.CodeViewer;
 import utils.FileUtils;
 
 import javax.swing.*;
@@ -23,14 +24,16 @@ public class GUI {
     JPanel panel1;
     JPanel panel2;
     JTree directoryTree;
-    JTextArea codeArea;
-    JTextArea fixCodeArea;
+
+    CodeViewer codeViewer = CodeViewer.getCodeViewer();
+
     JButton fixButton;
     JButton createTestButton;
 
     JLabel codePathLabel;
     JLabel testPathLabel;
 
+    String rootPath = System.getProperty("user.dir");
     String codePath;
     String testPath;
 
@@ -69,7 +72,6 @@ public class GUI {
                 messageDialog("ファイルが指定されていません");
                 return;
             }
-            fixCodeArea.setText("");
             Class<?> targetClass = new FileUtils().compileAndRun(codePath);
 
             JDialog dialog = new TestMaker(frame, targetClass);
@@ -83,7 +85,6 @@ public class GUI {
                 messageDialog("ファイルが指定されていません");
                 return;
             }
-            fixCodeArea.setText("");
             fixCode();
         });
 
@@ -130,7 +131,7 @@ public class GUI {
 
         // ディレクトリツリーの作成
         directoryTree = new JTree(root);
-        directoryTree.setPreferredSize(new Dimension(200, codeArea.getPreferredSize().height));
+        directoryTree.setPreferredSize(new Dimension(200, codeViewer.getPreferredSize().height));
         directoryTree.addTreeSelectionListener(e -> {
             String[] array =  e.getPath().toString().replaceAll("[\\[\\]\\s]", "").split(",");
             File treeSelectPath = new File(Path.of(new File(rootPath).getParentFile().getPath(), array).toString());
@@ -138,7 +139,7 @@ public class GUI {
                 try {
                     codePath = treeSelectPath.getPath();
                     testPath = codePath.replaceAll("\\.java$", "Test.java");
-                    codeArea.setText(FileUtils.loadText(codePath));
+                    codeViewer.setSourceCode(FileUtils.loadText(codePath));
                     codePathLabel.setText(codePath);
                     testPathLabel.setText(testPath);
                 } catch (IOException ex) {
@@ -151,14 +152,13 @@ public class GUI {
         testPathLabel = new JLabel("testPath");
 
         panel1.add(directoryTree, BorderLayout.WEST);
-        panel1.add(attachScrollbar(codeArea), BorderLayout.CENTER);
-        panel1.add(attachScrollbar(fixCodeArea), BorderLayout.EAST);
         panel2.add(codePathLabel, BorderLayout.PAGE_START);
         panel2.add(testPathLabel, BorderLayout.PAGE_END);
 
         Container contentPane = frame.getContentPane();
         contentPane.add(toolBar, BorderLayout.NORTH);
-        contentPane.add(panel1, BorderLayout.CENTER);
+        contentPane.add(panel1, BorderLayout.WEST);
+        contentPane.add(codeViewer.getPanel(), BorderLayout.CENTER);
         contentPane.add(panel2, BorderLayout.SOUTH);
 
         frame.setJMenuBar(menubar);
@@ -170,14 +170,9 @@ public class GUI {
         JOptionPane.showMessageDialog(panel1, label);
     }
 
-    JScrollPane attachScrollbar(Component component) {
-        return new JScrollPane(component);
-    }
-
     void closeEditor() {
         codePath = null;
-        codeArea.setText("");
-        fixCodeArea.setText("");
+        codeViewer.clearText();
         codePathLabel.setText("");
         testPathLabel.setText("");
     }
@@ -197,7 +192,7 @@ public class GUI {
         try {
             codePath = file.getPath();
             testPath = codePath.replaceAll("\\.java$", "Test.java");
-            codeArea.setText(FileUtils.loadText(codePath));
+            codeViewer.setSourceCode(FileUtils.loadText(codePath));
             codePathLabel.setText(codePath);
             testPathLabel.setText(testPath);
         } catch (IOException e) {
@@ -238,9 +233,9 @@ public class GUI {
             if (result == false) {
                 process.destroy();
                 System.out.println("timeout");
+                codeViewer.setFixCode("timeout");
                 return;
             }
-            System.out.println("Result : " + result);
 
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 StringBuilder log = new StringBuilder();
