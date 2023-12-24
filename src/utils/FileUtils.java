@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FileUtils {
+    public static final String CURRENT_DIRECTORY = System.getProperty("user.dir");
     public static String loadText(String path) throws IOException {
         return Files.readString(Path.of(path), StandardCharsets.UTF_8);
     }
