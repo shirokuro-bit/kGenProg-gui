@@ -22,20 +22,13 @@ import java.util.stream.Stream;
 public class GUI {
     JFrame frame;
     JPanel panel1;
-    JPanel panel2;
     JTree directoryTree;
 
+    GUIState guiState = GUIState.getInstance();
     CodeViewer codeViewer = CodeViewer.getCodeViewer();
 
     JButton fixButton;
     JButton createTestButton;
-
-    JLabel codePathLabel;
-    JLabel testPathLabel;
-
-    String rootPath = System.getProperty("user.dir");
-    String codePath;
-    String testPath;
 
     public GUI() {
         frame = new JFrame("kGenProg");
@@ -68,11 +61,11 @@ public class GUI {
         JToolBar toolBar = new JToolBar();
         createTestButton = new JButton("テスト作成");
         createTestButton.addActionListener(e -> {
-            if (codePath == null) {
+            if (guiState.getSourceCodePath() == null) {
                 messageDialog("ファイルが指定されていません");
                 return;
             }
-            Class<?> targetClass = new FileUtils().compileAndRun(codePath);
+            Class<?> targetClass = new FileUtils().compileAndRun(guiState.getSourceCodePath());
 
             JDialog dialog = new TestMaker(frame, targetClass);
             dialog.pack();
@@ -81,7 +74,7 @@ public class GUI {
 
         fixButton = new JButton("変換");
         fixButton.addActionListener(e -> {
-            if (codePath == null) {
+            if (guiState.getSourceCodePath() == null) {
                 messageDialog("ファイルが指定されていません");
                 return;
             }
@@ -92,7 +85,6 @@ public class GUI {
         toolBar.add(fixButton);
 
         panel1 = new JPanel();
-        panel2 = new JPanel();
 
         // ディレクトリツリーのルートノードを作成
         String rootPath = System.getProperty("user.dir");
@@ -134,32 +126,26 @@ public class GUI {
         directoryTree.setPreferredSize(new Dimension(200, codeViewer.getPreferredSize().height));
         directoryTree.addTreeSelectionListener(e -> {
             String[] array =  e.getPath().toString().replaceAll("[\\[\\]\\s]", "").split(",");
-            File treeSelectPath = new File(Path.of(new File(rootPath).getParentFile().getPath(), array).toString());
+            File treeSelectPath = new File(Path.of(new File(FileUtils.CURRENT_DIRECTORY).getParentFile().getPath(), array).toString());
             if (treeSelectPath.isFile()) {
                 try {
-                    codePath = treeSelectPath.getPath();
-                    testPath = codePath.replaceAll("\\.java$", "Test.java");
+                    String codePath = treeSelectPath.getPath();
+                    guiState.setSourceCodePath(codePath);
+                    guiState.setTestCodePath(codePath.replaceAll("\\.java$", "Test.java"));
                     codeViewer.setSourceCode(FileUtils.loadText(codePath));
-                    codePathLabel.setText(codePath);
-                    testPathLabel.setText(testPath);
                 } catch (IOException ex) {
                     messageDialog(ex.fillInStackTrace().toString());
                 }
             }
         });
 
-        codePathLabel = new JLabel("codePath");
-        testPathLabel = new JLabel("testPath");
-
         panel1.add(directoryTree, BorderLayout.WEST);
-        panel2.add(codePathLabel, BorderLayout.PAGE_START);
-        panel2.add(testPathLabel, BorderLayout.PAGE_END);
 
         Container contentPane = frame.getContentPane();
         contentPane.add(toolBar, BorderLayout.NORTH);
         contentPane.add(panel1, BorderLayout.WEST);
         contentPane.add(codeViewer.getPanel(), BorderLayout.CENTER);
-        contentPane.add(panel2, BorderLayout.SOUTH);
+        contentPane.add(guiState.getPanel(), BorderLayout.SOUTH);
 
         frame.setJMenuBar(menubar);
         frame.setVisible(true);
@@ -171,10 +157,8 @@ public class GUI {
     }
 
     void closeEditor() {
-        codePath = null;
         codeViewer.clearText();
-        codePathLabel.setText("");
-        testPathLabel.setText("");
+        guiState.clearCodePath();
     }
 
     void openFileChooser() {
@@ -190,11 +174,10 @@ public class GUI {
     void openFile(File file) {
         // TODO: 2023/11/30 0030 Testコードが分離されている場合の考慮が必要
         try {
-            codePath = file.getPath();
-            testPath = codePath.replaceAll("\\.java$", "Test.java");
-            codeViewer.setSourceCode(FileUtils.loadText(codePath));
-            codePathLabel.setText(codePath);
-            testPathLabel.setText(testPath);
+            String sourceCodePath = file.getPath();
+            guiState.setSourceCodePath(sourceCodePath);
+            guiState.setTestCodePath(sourceCodePath.replaceAll("\\.java$", "Test.java"));
+            codeViewer.setSourceCode(FileUtils.loadText(sourceCodePath));
         } catch (IOException e) {
             messageDialog(e.getMessage());
             throw new RuntimeException(e);
@@ -224,7 +207,7 @@ public class GUI {
     }
 
     void fixCode() {
-        String[] args = {"java", "-jar", "./lib/kGenProg-1.8.2.jar", "-r", "./", "-s", codePath, "-t", testPath, "--patch-output"};
+        String[] args = {"java", "-jar", "./lib/kGenProg-1.8.2.jar", "-r", "./", "-s", guiState.getSourceCodePath(), "-t", guiState.getTestCodePath(), "--patch-output"};
         ProcessBuilder processBuilder = new ProcessBuilder(args);
         try {
             Process process = processBuilder.start();
