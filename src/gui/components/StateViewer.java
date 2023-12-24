@@ -9,6 +9,9 @@ public class StateViewer extends AbstractComponent {
     private JLabel sourceCodePathLabel;
     private JLabel testCodePathLabel;
 
+    private StateViewer() {
+    }
+
     public void setText() {
         GUIState guiState = GUIState.getInstance();
         sourceCodePathLabel.setText(guiState.getSourceCodePath());

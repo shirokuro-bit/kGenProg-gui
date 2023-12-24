@@ -11,6 +11,9 @@ public class GUIState {
     private String sourceCodePath;
     private String testCodePath;
 
+    private GUIState() {
+    }
+
     public String getSourceCodePath() {
         return sourceCodePath;
     }

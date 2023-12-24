@@ -10,6 +10,8 @@ public class CodeViewer extends AbstractComponent {
     private final JTextArea sourceCodeArea = new JTextArea(30, 40);
     private final JTextArea fixCodeArea = new JTextArea(30, 40);
 
+    private CodeViewer() {}
+
     public void clearText() {
         setText("", "");
     }
