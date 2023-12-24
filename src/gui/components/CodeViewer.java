@@ -3,25 +3,12 @@ package gui.components;
 import javax.swing.*;
 import java.awt.*;
 
-public class CodeViewer {
+import static gui.components.GUIUtil.attachScrollbar;
+
+public class CodeViewer extends AbstractComponent {
     private static final CodeViewer codeViewer = new CodeViewer();
-
-    private final JPanel panel;
-    private final JTextArea sourceCodeArea;
-    private final JTextArea fixCodeArea;
-
-    private CodeViewer() {
-        panel = new JPanel();
-        sourceCodeArea = new JTextArea(30, 40);
-        fixCodeArea = new JTextArea(30, 40);
-
-        panel.add(attachScrollbar(sourceCodeArea), BorderLayout.CENTER);
-        panel.add(attachScrollbar(fixCodeArea), BorderLayout.EAST);
-    }
-
-    JScrollPane attachScrollbar(Component component) {
-        return new JScrollPane(component);
-    }
+    private final JTextArea sourceCodeArea = new JTextArea(30, 40);
+    private final JTextArea fixCodeArea = new JTextArea(30, 40);
 
     public void clearText() {
         setText("", "");
@@ -40,15 +27,17 @@ public class CodeViewer {
         fixCodeArea.setText(fixCode);
     }
 
-    public JPanel getPanel() {
-        return panel;
-    }
-
     public Dimension getPreferredSize() {
         return sourceCodeArea.getPreferredSize();
     }
 
     public static CodeViewer getCodeViewer() {
         return codeViewer;
+    }
+
+    @Override
+    public void buildComponent() {
+        panel.add(attachScrollbar(sourceCodeArea), BorderLayout.CENTER);
+        panel.add(attachScrollbar(fixCodeArea), BorderLayout.EAST);
     }
 }
