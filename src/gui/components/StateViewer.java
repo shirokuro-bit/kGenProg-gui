@@ -29,7 +29,7 @@ public class StateViewer extends AbstractComponent {
         sourceCodePathLabel = new JLabel("codePath");
         testCodePathLabel = new JLabel("testPath");
 
-        panel.add(sourceCodePathLabel);
-        panel.add(testCodePathLabel);
+        jPanel.add(sourceCodePathLabel);
+        jPanel.add(testCodePathLabel);
     }
 }

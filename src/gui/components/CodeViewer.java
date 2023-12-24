@@ -37,7 +37,7 @@ public class CodeViewer extends AbstractComponent {
 
     @Override
     public void buildComponent() {
-        panel.add(attachScrollbar(sourceCodeArea), BorderLayout.CENTER);
-        panel.add(attachScrollbar(fixCodeArea), BorderLayout.EAST);
+        jPanel.add(attachScrollbar(sourceCodeArea), BorderLayout.CENTER);
+        jPanel.add(attachScrollbar(fixCodeArea), BorderLayout.EAST);
     }
 }

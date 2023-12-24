@@ -35,8 +35,8 @@ public class GUIState {
         stateViewer.clearText();
     }
 
-    public JPanel getPanel() {
-        return stateViewer.getPanel();
+    public JPanel getJPanel() {
+        return stateViewer.getJPanel();
     }
 
     public static GUIState getInstance() {

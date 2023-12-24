@@ -142,6 +142,8 @@ public class GUI {
         contentPane.add(panel1, BorderLayout.WEST);
         contentPane.add(codeViewer.getPanel(), BorderLayout.CENTER);
         contentPane.add(guiState.getPanel(), BorderLayout.SOUTH);
+        contentPane.add(codeViewer.getJPanel(), BorderLayout.CENTER);
+        contentPane.add(guiState.getJPanel(), BorderLayout.SOUTH);
 
         frame.setJMenuBar(menubar);
         frame.setVisible(true);

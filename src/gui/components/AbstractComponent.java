@@ -3,11 +3,10 @@ package gui.components;
 import javax.swing.*;
 
 public abstract class AbstractComponent {
-    protected final JPanel panel = new JPanel();
-    public abstract void buildComponent();
-
-    public JPanel getPanel() {
+    protected final JPanel jPanel = new JPanel();
+    protected abstract void buildComponent();
+    public JPanel getJPanel() {
         buildComponent();
-        return panel;
+        return jPanel;
     }
 }
