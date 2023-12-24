@@ -116,10 +116,6 @@ public class GUI {
             createFileDirectoryTree(root, sortedFiles);
         }
 
-        codeArea = new JTextArea(30, 40);
-        codeArea.getSize();
-
-        fixCodeArea = new JTextArea(30, 40);
 
         // ディレクトリツリーの作成
         directoryTree = new JTree(root);
@@ -235,7 +231,7 @@ public class GUI {
                 if (matcher.find()) {
                     String generatedVariants = matcher.group(1);
                     System.out.println("Generated variants: " + generatedVariants);
-                    fixCodeArea.setText(FileUtils.loadText("./kgenprog-out/patch-v" + generatedVariants + "/CloseToZero.java"));
+                    codeViewer.setFixCode(FileUtils.loadText(STR."./kgenprog-out/patch-v\{generatedVariants}/CloseToZero.java"));
                 } else {
                     System.out.println("Generated variants not found.");
                 }
